@@ -1,6 +1,6 @@
 // backend/controllers/documentController.js
 const FirebaseStorageService = require('../services/firebaseStorage.service');
-const Document = require('../');
+const Document = require('../models/Document');
 
 class DocumentController {
   async uploadDocument(req, res) {
