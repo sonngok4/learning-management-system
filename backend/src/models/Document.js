@@ -29,7 +29,12 @@ const DocumentSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
-    size: Number
+    size: Number,
+    accessRoles: [{
+        type: String,
+        enum: ['student', 'instructor', 'admin'],
+        default: ['student', 'instructor', 'admin'],
+    }],
 }, {
     timestamps: true
 });

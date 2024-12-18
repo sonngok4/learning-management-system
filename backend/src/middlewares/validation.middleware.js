@@ -1,5 +1,6 @@
 // middlewares/validation.middleware.js
 const Joi = require('joi');
+const { updateAvatar } = require('../controllers/user.controller');
 
 // Middleware validation chung
 const validateSchema = (schema, source = 'body') => {
@@ -33,7 +34,7 @@ const schemas = {
             email: Joi.string().email().required(),
             password: Joi.string()
                 .min(8)
-                .pattern(new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$'))
+                .pattern(new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d!@#$%^&*()_+={}|;:,.<>?`~\\-\\[\\]\\/]{8,}$'))
                 .required(),
             role: Joi.string().valid('student', 'instructor', 'admin').default('student')
         }),
@@ -42,28 +43,36 @@ const schemas = {
             password: Joi.string().required()
         }),
         update: Joi.object({
-            full_name: Joi.string(),
+            firstName: Joi.string(),
+            lastName: Joi.string(),
+            username: Joi.string(),
             email: Joi.string().email(),
-            avatar: Joi.string().uri()
+            role: Joi.string().valid('student', 'instructor', 'admin')
+        }),
+        updateAvatar: Joi.object({
+            avatar: Joi.object().required().keys({
+                mimetype: Joi.string().valid('image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp').required(),
+                size: Joi.number().max(5 * 1024 * 1024).required()
+            })
         }),
         changePassword: Joi.object({
             oldPassword: Joi.string().required(),
             newPassword: Joi.string()
                 .min(8)
-                .pattern(new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$'))
+                .pattern(new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d!@#$%^&*()_+={}|;:,.<>?`~\\-\\[\\]\\/]{8,}$'))
                 .required()
         })
     },
     course: {
         create: Joi.object({
-            title: Joi.string().required(),
+            name: Joi.string().required(),
             description: Joi.string().required(),
             duration: Joi.string().required(),
             price: Joi.number().positive().required(),
             status: Joi.string().valid('active', 'inactive').default('active')
         }),
         update: Joi.object({
-            title: Joi.string(),
+            name: Joi.string(),
             description: Joi.string(),
             duration: Joi.string(),
             price: Joi.number().positive(),

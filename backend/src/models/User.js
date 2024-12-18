@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const PERMISSIONS = require('../config/permissions');
 const bcrypt = require('bcryptjs');
 
 const UserSchema = new mongoose.Schema({
@@ -35,7 +36,7 @@ const UserSchema = new mongoose.Schema({
     },
     avatar: {
         type: String,
-        default: 'default-avatar.png'
+        default: 'https://res.cloudinary.com/dexnxc3im/image/upload/v1734513440/default-avatar.jpg'
     },
     role: {
         type: String,
@@ -62,6 +63,28 @@ const UserSchema = new mongoose.Schema({
 }, {
     timestamps: true
 });
+
+UserSchema.methods.hasPermission = function (resource, action) {
+    const rolePermissions = PERMISSIONS[this.role];
+    return rolePermissions &&
+        rolePermissions[resource] &&
+        rolePermissions[resource][action] === true;
+};
+
+UserSchema.methods.canAccessDocument = function (document) {
+    // Admin có quyền truy cập tất cả tài liệu
+    if (this.role === 'admin') {
+        return true;
+    }
+
+    // Instructor có thể truy cập tài liệu của khóa học họ tạo
+    if (this.role === 'instructor' && document.course.createdBy.equals(this._id)) {
+        return true;
+    }
+
+    // Student có thể truy cập nếu vai trò của họ nằm trong accessRoles của tài liệu
+    return document.accessRoles.includes(this.role);
+};
 
 // Password hashing middleware
 UserSchema.pre('save', async function (next) {

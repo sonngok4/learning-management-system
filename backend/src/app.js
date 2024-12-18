@@ -50,17 +50,31 @@ app.use(requestLogger);
 // Apply rate limiter
 app.use("/api", apiLimiter);
 
+
+// Routes
+const index = require('./routes/index.routes')
+const authRoutes = require('./routes/auth.routes')
+const userRoutes = require('./routes/user.routes')
+const documentRoutes = require('./routes/document.routes')
+const courseRoutes = require('./routes/course.routes')
+// const lessonRoutes = require('./routes/lesson.routes')
+// const assignmentRoutes = require('./routes/assignment.routes')
+
+
+// Routes
+app.use("/", index)
+app.use('/api/auth', authRoutes);
+app.use("/api/users", userRoutes)
+app.use("/api/courses", courseRoutes)
+app.use('/api/documents', documentRoutes);
+// app.use('/api/lessons', lessonRoutes);
+// app.use('/api/assignments', assignmentRoutes);
+
+
+
 // Apply error handling
 app.use(notFoundHandler);
 app.use(errorHandler);
-
-// Routes
-const documentRoutes = require('./routes/document.routes')
-const authRoutes = require('./routes/auth.routes')
-
-// Routes
-// app.use('/api/documents', documentRoutes);
-app.use('/api/auth', authRoutes);
 
 
 // Error handling middleware

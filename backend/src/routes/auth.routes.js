@@ -10,28 +10,33 @@ const AuthMiddleware = require('../middlewares/auth.middleware');
 
 // Đăng ký người dùng
 router.post('/register',
-    // validateSchema(schemas.user.registration),
+    validateSchema(schemas.user.registration),
     AuthController.register
 );
 
 // Đăng nhập
 router.post('/login',
-    // validateSchema(schemas.user.login),
+    validateSchema(schemas.user.login),
     AuthController.login
 );
 
-// Cập nhật thông tin người dùng (yêu cầu xác thực)
-// router.put('/profile',
-//     AuthMiddleware.authenticate,
-//     validateSchema(schemas.user.update),
-//     AuthController.updateProfile
-// );
+// Đăng xuất
+router.post('/logout',
+    AuthMiddleware.authenticate,
+    AuthController.logout
+);
+
+// Làm mới phiên đăng nhập
+router.post('/refresh-token',
+    AuthMiddleware.refreshToken,
+    AuthController.refreshToken
+);
 
 // Thay đổi mật khẩu
-// router.post('/change-password',
-//     AuthMiddleware.authenticate,
-//     validateSchema(schemas.user.changePassword),
-//     AuthController.changePassword
-// );
+router.post('/change-password',
+    AuthMiddleware.authenticate,
+    validateSchema(schemas.user.changePassword),
+    AuthController.changePassword
+);
 
 module.exports = router;

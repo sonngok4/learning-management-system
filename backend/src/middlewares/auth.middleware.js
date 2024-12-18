@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const ApiError = require('../utils/api-error');
+const { ApiError } = require('../utils/api-error');
 
 class AuthMiddleware {
   // Xác thực token và gắn user vào request
@@ -40,7 +40,6 @@ class AuthMiddleware {
       if (!roles.includes(req.user.role)) {
         throw new ApiError(403, 'Access denied');
       }
-
       next();
     };
   }
