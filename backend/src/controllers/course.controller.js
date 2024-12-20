@@ -218,14 +218,14 @@ class CourseController {
 
             let courses;
             if (user.role === 'admin') {
-                // Admin có quyền lấy tất cả khóa học
-                courses = await Course.find();
+                // Admin có quyền lấy tất cả khóa học và thông tin giảng viên
+                courses = await Course.find().populate('instructor', 'username email firstName lastName avatar');  // Populate instructor thông qua ID của người dạy
             } else if (user.role === 'instructor') {
-                // Instructor chỉ có thể lấy các khóa học do họ tạo
-                courses = await Course.find({ createdBy: user._id });
+                // Instructor chỉ có thể lấy các khóa học do họ tạo và thông tin giảng viên
+                courses = await Course.find({ instructor: user._id }).populate('instructor', 'username email firstName lastName avatar');
             } else if (user.role === 'student') {
-                // Sinh viên chỉ có thể lấy các khóa học mà họ đã đăng ký
-                courses = await Course.find({ _id: { $in: user.enrolledCourses } });
+                // Sinh viên chỉ có thể lấy các khóa học mà họ đã đăng ký và thông tin giảng viên
+                courses = await Course.find({ _id: { $in: user.enrolledCourses } }).populate('instructor', 'username email firstName lastName avatar');
             } else {
                 return res.status(403).json({ message: 'Quyền truy cập không hợp lệ' });
             }
@@ -235,6 +235,7 @@ class CourseController {
             throw new ApiError(400, error.message);
         }
     }
+
 
     static async getCourseById(req, res) {
         try {

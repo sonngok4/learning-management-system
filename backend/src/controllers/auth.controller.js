@@ -26,7 +26,10 @@ class AuthController {
                 password
             });
 
-            res.status(201).json(user);
+            res.status(201).json({
+                success: true,
+                user
+            });
         } catch (error) {
             res.status(400).json({ message: error.message });
         }
@@ -43,7 +46,6 @@ class AuthController {
 
             // Find user
             const user = await User.findOne({ email });
-            console.log("user: ", user);
 
             if (!user) {
                 throw new ApiError(400, 'User not found');
@@ -72,7 +74,7 @@ class AuthController {
             });
 
             // Send response (optional: remove token from response if you rely entirely on cookies)
-            res.status(200).json({ user, accessToken, refreshToken });
+            res.status(200).json({ success: true, user, accessToken, refreshToken });
         } catch (error) {
             throw new ApiError(400, error.message);
         }
