@@ -14,12 +14,20 @@ router.get('/', AuthMiddleware.authenticate, CourseController.getAllCourses);
 router.get('/:id', AuthMiddleware.authenticate, CourseController.getCourseById);
 
 // Tạo khóa học (chỉ admin và giảng viên)
-router.post('/add',
+router.post('/create',
     AuthMiddleware.authenticate,
     AuthMiddleware.authorize('admin', 'instructor'),
     checkPermission('courses', 'create'),
     validateSchema(schemas.course.create),
     CourseController.createCourse
+);
+
+router.post('/create-with-lessons',
+    AuthMiddleware.authenticate,
+    AuthMiddleware.authorize('admin', 'instructor'),
+    checkPermission('courses', 'create'),
+    validateSchema(schemas.course.createWithLessons),
+    CourseController.createCourseWithLessons
 );
 
 // Cập nhật khóa học

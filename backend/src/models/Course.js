@@ -17,6 +17,7 @@ const CourseSchema = new mongoose.Schema({
     },
     category: {
         type: String,
+        enum: ['Programming', 'Data Science', 'Design', 'Business', 'Language', 'Mathematics', 'Music', 'Photography', 'Health & Fitness', 'Cooking', 'Personal Development', 'Engineering', 'AI & Machine Learning', 'Cybersecurity', 'Philosophy'],
         required: true
     },
     level: {

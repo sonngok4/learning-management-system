@@ -57,8 +57,8 @@ const authRoutes = require('./routes/auth.routes')
 const userRoutes = require('./routes/user.routes')
 const documentRoutes = require('./routes/document.routes')
 const courseRoutes = require('./routes/course.routes')
-// const lessonRoutes = require('./routes/lesson.routes')
-// const assignmentRoutes = require('./routes/assignment.routes')
+const lessonRoutes = require('./routes/lesson.routes')
+const assignmentRoutes = require('./routes/assignment.routes')
 
 
 // Routes
@@ -67,8 +67,8 @@ app.use('/api/auth', authRoutes);
 app.use("/api/users", userRoutes)
 app.use("/api/courses", courseRoutes)
 app.use('/api/documents', documentRoutes);
-// app.use('/api/lessons', lessonRoutes);
-// app.use('/api/assignments', assignmentRoutes);
+app.use('/api/lessons', lessonRoutes);
+app.use('/api/assignments', assignmentRoutes);
 
 
 

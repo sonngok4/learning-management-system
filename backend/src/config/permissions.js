@@ -1,4 +1,4 @@
-const PERMISSIONS = {
+module.exports = PERMISSIONS = {
     admin: {
         // Full system access
         users: {

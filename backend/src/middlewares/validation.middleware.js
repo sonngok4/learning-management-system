@@ -1,6 +1,7 @@
 // middlewares/validation.middleware.js
 const Joi = require('joi');
 const { updateAvatar } = require('../controllers/user.controller');
+const { level } = require('winston');
 
 // Middleware validation chung
 const validateSchema = (schema, source = 'body') => {
@@ -67,16 +68,113 @@ const schemas = {
         create: Joi.object({
             name: Joi.string().required(),
             description: Joi.string().required(),
-            duration: Joi.string().required(),
+            category: Joi.string().required(),
+            level: Joi.string().valid('Beginner', 'Intermediate', 'Advanced').default('Beginner'),
             price: Joi.number().positive().required(),
-            status: Joi.string().valid('active', 'inactive').default('active')
+            coverImage: Joi.string().required() || Joi.any(),
+            tags: Joi.array().items(Joi.string()).required()
         }),
         update: Joi.object({
             name: Joi.string(),
             description: Joi.string(),
-            duration: Joi.string(),
+            category: Joi.string(),
+            level: Joi.string().valid('Beginner', 'Intermediate', 'Advanced').default('Beginner'),
             price: Joi.number().positive(),
-            status: Joi.string().valid('active', 'inactive')
+            coverImage: Joi.string() || Joi.any(),
+            tags: Joi.array().items(Joi.string())
+        }),
+        createWithLessons: Joi.object({
+            name: Joi.string().required(),
+            description: Joi.string().required(),
+            category: Joi.string().required(),
+            level: Joi.string().valid('Beginner', 'Intermediate', 'Advanced').default('Beginner'),
+            price: Joi.number().positive().required(),
+            coverImage: Joi.string().required() || Joi.any(),
+            tags: Joi.array().items(Joi.string()).required(),
+            lessons: Joi.array().items(Joi.object({
+                title: Joi.string().required(),
+                content: Joi.string().required(),
+                videoUrl: Joi.string(),
+                duration: Joi.number().integer().min(0).default(0),
+                order: Joi.number().integer().min(0).default(0),
+                resources: Joi.array().items(Joi.object({
+                    name: Joi.string().required(),
+                    url: Joi.string().required()
+                }))
+            })
+            )
+        }),
+        updateWithLessons: Joi.object({
+            name: Joi.string(),
+            description: Joi.string(),
+            category: Joi.string(),
+            level: Joi.string().valid('Beginner', 'Intermediate', 'Advanced').default('Beginner'),
+            price: Joi.number().positive(),
+            coverImage: Joi.string() || Joi.any(),
+            tags: Joi.array().items(Joi.string()),
+            lessons: Joi.array().items(Joi.object({
+                title: Joi.string(),
+                content: Joi.string(),
+                videoUrl: Joi.string() || Joi.any(),
+                duration: Joi.number().integer().min(0),
+                order: Joi.number().integer().min(0),
+                resources: Joi.array().items(Joi.object({
+                    name: Joi.string(),
+                    url: Joi.string()
+                }))
+            }))
+        })
+    },
+    lesson: {
+        create: Joi.object({
+            title: Joi.string().required(),
+            course: Joi.string().required(),
+            content: Joi.string().required(),
+            videoUrl: Joi.string() || Joi.any(),
+            duration: Joi.number().integer().min(0).default(0),
+            order: Joi.number().integer().min(0).default(0),
+            resources: Joi.array().items(Joi.object({
+                name: Joi.string().required(),
+                url: Joi.string().required()
+            }))
+        }),
+        update: Joi.object({
+            title: Joi.string(),
+            course: Joi.string(),
+            content: Joi.string(),
+            videoUrl: Joi.string(),
+            duration: Joi.number().integer().min(0),
+            order: Joi.number().integer().min(0),
+            resources: Joi.array().items(Joi.object({
+                name: Joi.string(),
+                url: Joi.string()
+            }))
+        })
+    },
+    assignment: {
+        create: Joi.object({
+            title: Joi.string().required(),
+            course: Joi.string().required(),
+            description: Joi.string().required(),
+            dueDate: Joi.date().required(),
+            maxScore: Joi.number().integer().min(0).default(100),
+            attachments: Joi.array().items(Joi.string()),
+            submissions: Joi.array().items(Joi.object({
+                student: Joi.string().required(),
+                score: Joi.number().integer().min(0).max(100)
+            }))
+        }),
+        update: Joi.object({
+            title: Joi.string(),
+            course: Joi.string(),
+            description: Joi.string(),
+            dueDate: Joi.date(),
+            maxScore: Joi.number().integer().min(0),
+            attachments: Joi.array().items(Joi.string()),
+            submissions: Joi.array().items(Joi.object({
+                student: Joi.string(),
+                score: Joi.number().integer().min(0).max(100)
+            }))
         })
     },
     document: {
