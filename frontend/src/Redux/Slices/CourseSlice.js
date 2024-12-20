@@ -73,22 +73,49 @@ export const createNewCourse = createAsyncThunk("/course/create", async (data) =
 
 export const createNewCourseWithLesson = createAsyncThunk("/course/create-with-lesson", async (data) => {
     try {
-        const res = axiosInstance.post("/courses/create-with-lesson", data, {
+        const formData = new FormData();
+
+        // Thêm dữ liệu khóa học
+        formData.append("name", data?.name);
+        formData.append("description", data?.description);
+        formData.append("category", data?.category);
+        formData.append("coverImage", data?.coverImage);
+        formData.append("level", data?.level);
+        formData.append("price", data?.price);
+
+        // Thêm tags
+        data?.tags.forEach(tag => {
+            formData.append("tags[]", tag);
+        });
+
+        // Thêm lessons dưới dạng JSON string
+        formData.append("lessons", JSON.stringify(data.lessons));
+
+        // Thêm video files nếu có
+        data.lessons.forEach((lesson) => {
+            if (lesson.videoFile) {
+                formData.append(`videos`, lesson.videoFile);
+            }
+        });
+
+        const res = await axiosInstance.post("/courses/create-with-lessons", formData, {
             headers: {
                 "Content-Type": "multipart/form-data",
                 credentials: "include"
             }
         });
+
         toast.promise(res, {
-            loading: "Creating new course with lesson",
-            success: "Course created with lesson sucessfully",
-            error: "Failed to create course with lesson"
+            loading: "Creating new course with lessons",
+            success: "Course created with lessons successfully",
+            error: "Failed to create course with lessons"
         });
+
         return (await res).data;
     } catch (error) {
         toast.error(error?.response?.data?.message);
     }
-})
+});
 
 export const deleteCourse = createAsyncThunk("/course/delete", async (id) => {
     try {
@@ -138,6 +165,20 @@ export const updateCourse = createAsyncThunk("/course/update", async (data) => {
     }
 });
 
+export const addLesson = createAsyncThunk(
+    'course/addLesson',
+    async ({ courseId, lessonData }) => {
+        try {
+            const response = await axiosInstance.post(`/courses/${courseId}/lessons`, lessonData);
+            return response.data;
+        } catch (error) {
+            toast.error(error?.response?.data?.message || "Failed to add lesson");
+            throw new Error(error?.response?.data?.message || "Failed to add lesson");
+        }
+    }
+);
+
+
 const courseSlice = createSlice({
     name: "course",
     initialState,
@@ -159,6 +200,26 @@ const courseSlice = createSlice({
             .addCase(getMyCourses.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.error.message;
+            })
+            // Handle addLesson async action
+            .addCase(addLesson.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(addLesson.fulfilled, (state, action) => {
+                state.loading = false;
+                // Assuming courseId and lesson are returned in the response
+                const { lesson, courseId } = action.payload;
+
+                // Update the courseData with the new lesson added to the specific course
+                state.courseData = state.courseData.map(course =>
+                    course._id === courseId
+                        ? { ...course, lessons: [...course.lessons, lesson] }
+                        : course
+                );
+            })
+            .addCase(addLesson.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message; // Handle any errors
             });
     }
 });

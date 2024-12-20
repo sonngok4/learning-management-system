@@ -59,6 +59,7 @@ const documentRoutes = require('./routes/document.routes')
 const courseRoutes = require('./routes/course.routes')
 const lessonRoutes = require('./routes/lesson.routes')
 const assignmentRoutes = require('./routes/assignment.routes')
+const enrollmentRoutes = require('./routes/enrollment.routes')
 
 
 // Routes
@@ -69,7 +70,7 @@ app.use("/api/courses", courseRoutes)
 app.use('/api/documents', documentRoutes);
 app.use('/api/lessons', lessonRoutes);
 app.use('/api/assignments', assignmentRoutes);
-
+app.use('/api/enrollments', enrollmentRoutes);
 
 
 // Apply error handling

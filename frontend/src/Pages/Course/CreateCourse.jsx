@@ -95,10 +95,36 @@ function CreateCourse() {
 
     async function OnFormSubmit(e) {
         e.preventDefault();
-        if (!userInput.name || !userInput.description || !userInput.category || !userInput.price) {
-            toast.error("All fields are mandatory");
+        // if (!userInput.name || !userInput.description || !userInput.category || !userInput.price) {
+        //     toast.error("All fields are mandatory");
+        //     return;
+        // }
+
+        if (!userInput.name) {
+            toast.error("Course name is required");
             return;
         }
+
+        if (!userInput.description) {
+            toast.error("Course description is required");
+            return;
+        }
+
+        if (!userInput.category) {
+            toast.error("Category is required");
+            return;
+        }
+
+        if (!userInput.price) {
+            toast.error("Price is required");
+            return;
+        }
+
+        if (!userInput.previewImage) {
+            toast.error("Cover image is required");
+            return;
+        }
+
 
         if (!userInput.coverImage) {
             toast.error("Cover image is required");

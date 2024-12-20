@@ -15,7 +15,8 @@ function EditProfile() {
 
     const [data, setData] = useState({
         previewImage: "",
-        fullName: "",
+        firstName: "",
+        lastName: "",
         avatar: undefined,
         userId: useSelector((state) => state?.auth?.data?._id)
     });
@@ -47,20 +48,17 @@ function EditProfile() {
     async function onFormSubmit(e) {
         e.preventDefault();
         //    console.log(data)
-        if (!data.fullName || !data.avatar) {
+        if (!data.firstName || !data.lastName || !data.avatar) {
             toast.error("All fields are mandatory");
             return;
         }
-        if (data.fullName.length < 5) {
-            toast.error("Name cannot be of less than 5 characters");
-            return;
-        }
 
-        const fromData = new FormData();
-        fromData.append("fullName", data.fullName);
-        fromData.append("avatar", data.avatar);
+        const formData = new FormData();
+        formData.append("firstName", data.firstName);
+        formData.append("lastName", data.lastName);
+        formData.append("avatar", data.avatar);
 
-        await dispatch(updateProfile(fromData));
+        await dispatch(updateProfile(formData));
 
         await dispatch(getuserData());
 
@@ -98,17 +96,21 @@ function EditProfile() {
                         accept=".jpg, .png, .svg,.jpeg"
                     />
 
-                    <div className="flex flex-col gap-1 w-full">
-                        <label htmlFor="fullName" className="font-semibold"> Full Name</label>
+
+                    <div className="gap-3 grid grid-cols-2">
                         <input
-                            type="text"
-                            required
-                            name="fullName"
-                            id="fullName"
-                            placeholder="Enter your FullName...."
-                            className="bg-transparent px-2 py-1 border"
                             onChange={handleInputChange}
-                            value={data.fullName}
+                            type="text"
+                            placeholder="First name"
+                            name="firstName"
+                            className="border-white bg-transparent p-2 border rounded-sm"
+                        />
+                        <input
+                            onChange={handleInputChange}
+                            type="text"
+                            placeholder="Last name"
+                            name="lastName"
+                            className="border-white bg-transparent p-2 border rounded-sm"
                         />
                     </div>
                     <button type="submit" className="bg-yellow-600 hover:bg-yellow-500 mt-2 py-2 rounded-sm w-full font-semibold text-lg transition-all duration-300 cursor-pointer ease-in-out">

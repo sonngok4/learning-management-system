@@ -204,6 +204,36 @@ class CourseController {
         }
     }
 
+    static async addLesson(req, res) {
+        const { courseId } = req.params;
+        const { title, content, videoUrl, duration, order } = req.body;
+        try {
+            const course = await Course.findById(courseId);
+            if (!course) {
+                return res.status(404).json({ message: "Course not found" });
+            }
+
+            const newLesson = new Lesson({
+                title,
+                content,
+                videoUrl,
+                duration,
+                order,
+                course: courseId
+            });
+
+            await newLesson.save();
+
+            // Thêm bài học vào khóa học
+            course.lessons.push(newLesson._id);
+            await course.save();
+
+            res.status(201).json({ success: true, message: "Lesson added successfully", lesson: newLesson, courseId });
+        } catch (error) {
+            throw new ApiError(400, error.message);
+        }
+    }
+
     static async updateCourse(req, res) {
         try {
             const course = await Course.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -240,10 +270,10 @@ class CourseController {
                 courses = await Course.find().populate('instructor', 'username email firstName lastName avatar');  // Populate instructor thông qua ID của người dạy
             } else if (user.role === 'instructor') {
                 // Instructor chỉ có thể lấy các khóa học do họ tạo và thông tin giảng viên
-                courses = await Course.find({ instructor: user._id }).populate('instructor', 'username email firstName lastName avatar');
+                courses = await Course.find({ instructor: user._id }).populate('instructor', 'username email firstName lastName avatar').populate('lessons', 'title content videoUrl duration order resources isPreview');
             } else if (user.role === 'student') {
                 // Sinh viên chỉ có thể lấy các khóa học mà họ đã đăng ký và thông tin giảng viên
-                courses = await Course.find({ _id: { $in: user.enrolledCourses } }).populate('instructor', 'username email firstName lastName avatar');
+                courses = await Course.find({ _id: { $in: user.enrolledCourses } }).populate('instructor', 'username email firstName lastName avatar').populate('lessons', 'title content videoUrl duration order resources isPreview');
             } else {
                 return res.status(403).json({ message: 'Quyền truy cập không hợp lệ' });
             }
@@ -256,12 +286,18 @@ class CourseController {
 
     static async getAllCourses(req, res) {
         try {
-            const courses = await Course.find().populate('instructor', 'username email firstName lastName avatar');
+            const courses = await Course.find()
+                .populate('instructor', 'username email firstName lastName avatar')
+                .populate(
+                    'lessons',
+                    'title content videoUrl duration order resources isPreview', // Chỉ định các trường bạn muốn lấy từ `Lesson`
+                );
             res.status(200).json(courses);
         } catch (error) {
             throw new ApiError(400, error.message);
         }
     }
+
 
     static async getCourseById(req, res) {
         try {

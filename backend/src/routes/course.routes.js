@@ -35,6 +35,8 @@ router.post('/create-with-lessons',
     CourseController.createCourseWithLessons
 );
 
+router.post('/:courseId/lessons', AuthMiddleware.authenticate, CourseController.addLesson);
+
 // Cập nhật khóa học
 router.put('/:id',
     AuthMiddleware.authenticate,

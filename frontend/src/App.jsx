@@ -27,6 +27,8 @@ import CheckoutSuccess from './Pages/Payment/CheckoutSuccess.jsx'
 import Signup from './Pages/Signup.jsx'
 import EditProfile from './Pages/User/EditProfile.jsx'
 import Profile from './Pages/User/Profile.jsx'
+import CourseLessons from './Pages/Course/CourseLesson';
+import CourseLearn from './Components/CourseLearn';
 
 function App() {
   return (
@@ -36,6 +38,9 @@ function App() {
         <Route path='/about' element={<AboutUs />}></Route>
         <Route path='/courses' element={<CourseList />}></Route>
         <Route path='/courses/my-courses' element={<MyCourses />}></Route>
+        <Route path="/course/lessons" element={<CourseLessons />} />
+        <Route path="/course/lessons/:lessonId" element={<CourseLessons />} />
+        <Route path="course/learn" element={<CourseLearn />}></Route>
         <Route path='/contact' element={<Contact />}></Route>
         <Route path='/denied' element={<Denied />}></Route>
         <Route path='/course/description' element={<CourseDescripition />}></Route>

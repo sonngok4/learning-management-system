@@ -7,96 +7,96 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import HomeLayout from "../../Layouts/HomeLayout";
 import { updateCourse } from "../../Redux/Slices/CourseSlice";
 
-  function EditCourse(){
+function EditCourse() {
 
-    const dispatch =useDispatch();
-    const navigate =useNavigate();
-    const {state }=useLocation();
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const { state } = useLocation();
     // console.log(state)
-    const [userInput, setUserInput]=useState({
-        id:state?._id,
-        title:state?.title,
-        category:state?.category,
-        description:state?.description,
-        createdBy:state?.createdBy,
-        thumbnail:null,
-        previewImage:state.thumbnail?.secure_url,
+    const [userInput, setUserInput] = useState({
+        id: state?._id,
+        title: state?.title,
+        category: state?.category,
+        description: state?.description,
+        createdBy: state?.createdBy,
+        thumbnail: null,
+        previewImage: state.thumbnail?.secure_url,
     });
 
-     function handleImageUpload(e){
+    function handleImageUpload(e) {
         e.preventDefault();
-        const uploadedImage=e.target.files[0];
-        if(uploadedImage){
+        const uploadedImage = e.target.files[0];
+        if (uploadedImage) {
             const fileReader = new FileReader();
             fileReader.readAsDataURL(uploadedImage);
-            fileReader.addEventListener("load", function(){
+            fileReader.addEventListener("load", function () {
                 setUserInput({
                     ...userInput,
-                    previewImage:this.result,
-                    thumbnail:uploadedImage
+                    previewImage: this.result,
+                    thumbnail: uploadedImage
                 })
             })
         }
     }
-    
-    function handleUserInput(e){
+
+    function handleUserInput(e) {
         e.preventDefault();
-        const {name,value}=e.target;
-       setUserInput({
+        const { name, value } = e.target;
+        setUserInput({
             ...userInput,
-            [name]:value
-       })
+            [name]: value
+        })
     }
 
-    async function OnFormSubmit(e){
+    async function OnFormSubmit(e) {
         e.preventDefault();
-        if(!userInput.title ||!userInput.description||!userInput.category ){
+        if (!userInput.title || !userInput.description || !userInput.category) {
             toast.error("All fields are mandatory");
             return;
         }
 
         const response = await dispatch(updateCourse(userInput));
-        if(response?.payload?.success){
+        if (response?.payload?.success) {
             setUserInput({
-                title:"",
-                category:"",
-                description:"",
-                thumbnail:null,
+                title: "",
+                category: "",
+                description: "",
+                thumbnail: null,
             });
             navigate("/courses");
         }
     }
-    return(
+    return (
         <HomeLayout>
-            <div className="flex items-center justify-center h-[100vh]">
-                <form 
+            <div className="flex justify-center items-center h-[100vh]">
+                <form
                     onSubmit={OnFormSubmit}
-                    className="flex flex-col justify-center gap-5 rounded-lg p-4 mt-5 text-white w-[80vw] md:w-[700px] sm:my-10   relative shadow-[0_0_10px_black]  "
+                    className="relative flex flex-col justify-center gap-5 shadow-[0_0_10px_black] sm:my-10 mt-5 p-4 rounded-lg w-[80vw] md:w-[700px] text-white"
                 >
                     <div>
-                        <Link to={"/"} className=" absolute left-2  text-lg text-accent cursor-pointer">
-                            <AiOutlineArrowLeft/>
+                        <Link to={"/"} className="left-2 absolute text-accent text-lg cursor-pointer">
+                            <AiOutlineArrowLeft />
                         </Link>
                     </div>
-            
-                    <h1 className=" text-center text-2xl font-bold">
+
+                    <h1 className="font-bold text-2xl text-center">
                         Edit Course
                     </h1>
 
-                    <main className=" grid lg:grid-cols-2 grid-cols-1 gap-x-10">
+                    <main className="gap-x-10 grid grid-cols-1 lg:grid-cols-2">
                         <div>
                             <div>
-                                <label htmlFor="image_uploads" className="  cursor-pointer">
-                                        {userInput.previewImage ? (
-                                            <img 
-                                                className=" w-full h-44 m-auto border"
-                                                src={userInput.previewImage}
-                                            />
-                                        ):(
-                                            <div className=" w-full h-44 m-auto flex items-center justify-center border">
-                                                <h1 className=" font-bold text-lg">  Upload your course thumbnail</h1>
-                                            </div>
-                                        ) }
+                                <label htmlFor="image_uploads" className="cursor-pointer">
+                                    {userInput.previewImage ? (
+                                        <img
+                                            className="m-auto border w-full h-44"
+                                            src={userInput.previewImage}
+                                        />
+                                    ) : (
+                                        <div className="flex justify-center items-center m-auto border w-full h-44">
+                                            <h1 className="font-bold text-lg">  Upload your course thumbnail</h1>
+                                        </div>
+                                    )}
                                 </label>
                                 <input
                                     className="hidden"
@@ -107,10 +107,10 @@ import { updateCourse } from "../../Redux/Slices/CourseSlice";
                                     onChange={handleImageUpload}
                                 />
                             </div>
-                                   
-                            <div className=" flex  flex-col gap-1">
-                                <label className=" text-lg font-semibold" htmlFor="title">
-                                            Course title
+
+                            <div className="flex flex-col gap-1">
+                                <label className="font-semibold text-lg" htmlFor="title">
+                                    Course title
                                 </label>
                                 <input
                                     required
@@ -122,13 +122,13 @@ import { updateCourse } from "../../Redux/Slices/CourseSlice";
                                     value={userInput.title}
                                     onChange={handleUserInput}
                                 />
-                            </div>   
+                            </div>
                         </div >
 
                         <div className="flex flex-col gap-1">
-                            <div className=" flex  flex-col gap-1">
-                                <label className=" text-lg font-semibold" htmlFor="createdBy">
-                                        Course Instructor
+                            <div className="flex flex-col gap-1">
+                                <label className="font-semibold text-lg" htmlFor="createdBy">
+                                    Course Instructor
                                 </label>
                                 <input
                                     required
@@ -140,10 +140,10 @@ import { updateCourse } from "../../Redux/Slices/CourseSlice";
                                     value={userInput.createdBy}
                                     onChange={handleUserInput}
                                 />
-                            </div>  
-                            <div className=" flex  flex-col gap-1">
-                                <label className=" text-lg font-semibold" htmlFor="category">
-                                        Course category
+                            </div>
+                            <div className="flex flex-col gap-1">
+                                <label className="font-semibold text-lg" htmlFor="category">
+                                    Course category
                                 </label>
                                 <input
                                     required
@@ -155,10 +155,10 @@ import { updateCourse } from "../../Redux/Slices/CourseSlice";
                                     value={userInput.category}
                                     onChange={handleUserInput}
                                 />
-                            </div>      
-                            <div className=" flex  flex-col gap-1">
-                                <label className=" text-lg font-semibold" htmlFor="description">
-                                        Course description
+                            </div>
+                            <div className="flex flex-col gap-1">
+                                <label className="font-semibold text-lg" htmlFor="description">
+                                    Course description
                                 </label>
                                 <textarea
                                     required
@@ -166,21 +166,21 @@ import { updateCourse } from "../../Redux/Slices/CourseSlice";
                                     name="description"
                                     id="description"
                                     placeholder="Enter course description"
-                                    className="bg-transparent px-2 py-1  h-24 overflow-scroll resize-none border"
+                                    className="bg-transparent px-2 py-1 border h-24 overflow-scroll resize-none"
                                     value={userInput.description}
                                     onChange={handleUserInput}
                                 />
-                            </div>        
+                            </div>
                         </div>
                     </main>
 
-                    <button type="submit" className="w-full bg-yellow-600 text-lg hover:bg-yellow-500 transition-all duration-300 ease-in-out py-2 rounded-sm font-semibold">
+                    <button type="submit" className="bg-yellow-600 hover:bg-yellow-500 py-2 rounded-sm w-full font-semibold text-lg transition-all duration-300 ease-in-out">
                         Update Course
                     </button>
 
                 </form>
             </div>
-        </HomeLayout>  
+        </HomeLayout>
     )
 }
 export default EditCourse;

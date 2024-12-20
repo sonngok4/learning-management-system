@@ -6,10 +6,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import Footer from '../Components/Footer.jsx';
 import { logout } from '../Redux/Slices/AuthSlice.js';
 
-HomeLayout.propTypes = {
-    children: <></>
-}
-
 function HomeLayout({ children }) {
 
     const dispatch = useDispatch();
