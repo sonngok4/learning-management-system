@@ -21,6 +21,20 @@ class UserController {
         }
     }
 
+    static async getProfile(req, res) {
+        try {
+            console.log("User: ", req.user);
+
+            // const user = await User.findById(req.user._id);
+            const user = req.user;
+            res.json({
+                user
+            });
+        } catch (error) {
+            throw new ApiError(400, error.message);
+        }
+    }
+
     static async getUserByRole(req, res) {
         try {
             const users = await User.find({ role: req.params.role });

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import {toast} from 'react-hot-toast'
+import { toast } from 'react-hot-toast'
 import { BsPersonCircle } from "react-icons/bs";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
@@ -8,59 +8,66 @@ import { isEmail, isPassword } from "../Helpers/regexMatcher";
 import HomeLayout from "../Layouts/HomeLayout";
 import { creatAccount } from "../Redux/Slices/AuthSlice";
 
-function Signup(){
+function Signup() {
 
     const dispatch = useDispatch();
-   const navigate = useNavigate();
+    const navigate = useNavigate();
 
 
-    const [prevImage, setPrevImage]=useState("");
+    const [prevImage, setPrevImage] = useState("");
 
-    const [signupData, setSignupData]=useState({
-        fullName:"",
-        email:"",
-        password:"",
-        avatar:"",
+    const [signupData, setSignupData] = useState({
+        firstName: "",
+        lastName: "",
+        username: "",
+        email: "",
+        password: "",
+        avatar: "",
     });
 
-    function handleUserInput(e){
-        const{name, value}=e.target;
+    function handleUserInput(e) {
+        const { name, value } = e.target;
         setSignupData({
             ...signupData,
-            [name]:value
+            [name]: value
         })
     }
 
-    function getImage(event){
+    function getImage(event) {
         event.preventDefault();
 
         //getting image
         const uploadedImage = event.target.files[0];
 
-        if(uploadedImage){
-           setSignupData({
+        if (uploadedImage) {
+            setSignupData({
                 ...signupData,
-                avatar:uploadedImage
-           });
-           const fileReader =new FileReader();
-           fileReader.readAsDataURL(uploadedImage);
-           fileReader.addEventListener("load", function(){
-                 console.log(this.result);
+                avatar: uploadedImage
+            });
+            const fileReader = new FileReader();
+            fileReader.readAsDataURL(uploadedImage);
+            fileReader.addEventListener("load", function () {
+                console.log(this.result);
                 setPrevImage(this.result);
-           })   
+            })
         }
     }
 
-   async function createNewAccount(event){
+    async function createNewAccount(event) {
         event.preventDefault();
-        if (!signupData.email ||!signupData.fullName||!signupData.avatar || !signupData.password) {
+        if (!signupData.email || !signupData.firstName || !signupData.lastName || !signupData.password) {
             toast.error("Please fill all the details ");
             return;
         }
 
         //checking name filed 
-        if(signupData.fullName.length<5){
-            toast.error("Name should be atleast of 5characters ")
+        if (!signupData.firstName) {
+            toast.error("Please enter your name");
+            return;
+        }
+
+        if (!signupData.lastName) {
+            toast.error("Please enter your last name");
             return;
         }
 
@@ -71,102 +78,165 @@ function Signup(){
         }
 
         //checking password
-        if(!isPassword(signupData.password)){
-            toast.error("Password should be 6 - 16 character long with atleast a number and special character");
+        // Password regex validation for different conditions
+        const password = signupData.password;
+
+        // Check if password has at least 8 characters
+        if (password.length < 8) {
+            toast.error("Password must be at least 8 characters long.");
             return;
         }
 
+        // Check if password contains at least one lowercase letter
+        if (!/[a-z]/.test(password)) {
+            toast.error("Password must contain at least one lowercase letter.");
+            return;
+        }
+
+        // Check if password contains at least one uppercase letter
+        if (!/[A-Z]/.test(password)) {
+            toast.error("Password must contain at least one uppercase letter.");
+            return;
+        }
+
+        // Check if password contains at least one digit
+        if (!/\d/.test(password)) {
+            toast.error("Password must contain at least one digit.");
+            return;
+        }
+
+        // Check if password contains at least one special character
+        if (!/[!@#$%^&*()_+={}|;:,.<>?`~\-\[\]\/]/.test(password)) {
+            toast.error("Password must contain at least one special character.");
+            return;
+        }
+        
         const formData = new FormData();
-        formData.append("fullName", signupData.fullName);
+        formData.append("firstName", signupData.firstName);
+        formData.append("lastName", signupData.lastName);
+        formData.append("username", signupData.username);
         formData.append("email", signupData.email);
         formData.append("password", signupData.password);
         formData.append("avatar", signupData.avatar);
 
 
         //dispatch create account action
-       const response = await dispatch(creatAccount(formData));
-        if(response?.payload?.success){
+        const response = await dispatch(creatAccount(formData));
+        if (response?.payload?.success) {
             navigate("/");
             setSignupData({
-                fullName:"",
-                email:"",
-                password:"",
-                avatar:"",
+                firstName: "",
+                lastName: "",
+                username: "",
+                email: "",
+                password: "",
+                avatar: "",
             })
             setPrevImage("");
         }
     }
-    return(
+    return (
         <HomeLayout>
-                <div className=" flex items-center justify-center h-[90vh]">
-                    <form  noValidate onSubmit={createNewAccount} className="flex flex-col   justify-center gap-3  rounded-lg text-white p-4 w-80  shadow-[0_0_10px_black] ">
-                        <h1 className="text-center text-2xl font-bold">Registion Page</h1>
-                        <label htmlFor="image_uploads" className=" cursor-pointer">
-                            {prevImage ? (
-                               < img  className="w-24 h-24 rounded-full m-auto" src={prevImage}  />
-                               ) : (
-                                    <BsPersonCircle className="w-24 h-24 rounded-full m-auto"/>
-                            ) }
-                        </label>
-                        <input 
-                            className="hidden"
-                            type="file"
-                            name="image_uploads"
-                            id="image_uploads"
-                            accept=".jpg, .jpeg , .png ,.svg"
-                            onChange={getImage}
-                        />
+            <div className="flex justify-center items-center h-[90vh]">
+                <form noValidate onSubmit={createNewAccount} className="flex flex-col justify-center gap-3 shadow-[0_0_10px_black] p-4 rounded-lg w-80 text-white">
+                    <h1 className="font-bold text-2xl text-center">Registration</h1>
+                    <label htmlFor="image_uploads" className="cursor-pointer">
+                        {prevImage ? (
+                            < img className="m-auto rounded-full w-24 h-24" src={prevImage} />
+                        ) : (
+                            <BsPersonCircle className="m-auto rounded-full w-24 h-24" />
+                        )}
+                    </label>
+                    <input
+                        className="hidden"
+                        type="file"
+                        name="image_uploads"
+                        id="image_uploads"
+                        accept=".jpg, .jpeg , .png ,.svg"
+                        onChange={getImage}
+                    />
 
-                        <div className="flex flex-col gap-1">
-                            <label htmlFor="fullName" className="font-semibold">Name</label>
-                            <input 
+                    <div className="gap-4 grid grid-cols-1 md:grid-cols-2">
+                        <div className="col-span-1">
+                            <label htmlFor="firstName" className="font-semibold">First Name</label>
+                            <input
                                 type="text"
                                 required
-                                name="fullName"
-                                id="fullName"
-                                placeholder="Enter your FullName...."
-                                className=" bg-transparent px-2 py-1 border"
+                                name="firstName"
+                                id="firstName"
+                                placeholder="First Name"
+                                className="bg-transparent py-1 w-full"
                                 onChange={handleUserInput}
-                                value={signupData.fullName}
-                             />
+                                value={signupData.firstName}
+                            />
                         </div>
-
-                        <div className="flex flex-col gap-1">
-                            <label htmlFor="email" className="font-semibold">Email</label>
-                            <input 
-                                type="email"
+                        <div className="col-span-1">
+                            <label htmlFor="lastName" className="font-semibold">Last Name</label>
+                            <input
+                                type="text"
                                 required
-                                name="email"
-                                id="email"
-                                placeholder="Enter your email...."
-                                className=" bg-transparent px-2 py-1 border"
+                                name="lastName"
+                                id="lastName"
+                                placeholder="Last Name"
+                                className="bg-transparent py-1 w-full"
                                 onChange={handleUserInput}
-                                value={signupData.email}
-                             />
+                                value={signupData.lastName}
+                            />
                         </div>
+                    </div>
 
-                        <div className="flex flex-col gap-1">
-                            <label htmlFor="password" className="font-semibold">Password</label>
-                            <input 
-                                type="password"
-                                required
-                                name="password"
-                                id="password"
-                                placeholder="Enter your password...."
-                                className=" bg-transparent px-2 py-1 border"
-                                onChange={handleUserInput}
-                                value={signupData.password}
-                             />
-                        </div>
-                        <button  type="submit" className=" mt-2 bg-yellow-600 hover:bg-yellow-500 py-2 font-semibold text-lg cursor-pointer transition-all ease-in-out duration-300  rounded-sm">
-                                Create Account
-                        </button>
-                        <p className="text-center">
-                            Already have an account ? <Link to="/login" className=" link  text-accent cursor-pointer">Login</Link>
-                        </p>
+                    <div className="bg-gray-400 w-full h-[1px]"></div>
 
-                    </form>
-                </div>
+                    <div className="flex flex-col gap-1">
+                        <label htmlFor="username" className="font-semibold">Username</label>
+                        <input
+                            type="text"
+                            required
+                            name="username"
+                            id="username"
+                            placeholder="Enter your username...."
+                            className="bg-transparent py-1"
+                            onChange={handleUserInput}
+                            value={signupData.username}
+                        />
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                        <label htmlFor="email" className="font-semibold">Email</label>
+                        <input
+                            type="email"
+                            required
+                            name="email"
+                            id="email"
+                            placeholder="Enter your email...."
+                            className="bg-transparent py-1"
+                            onChange={handleUserInput}
+                            value={signupData.email}
+                        />
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                        <label htmlFor="password" className="font-semibold">Password</label>
+                        <input
+                            type="password"
+                            required
+                            name="password"
+                            id="password"
+                            placeholder="Enter your password...."
+                            className="bg-transparent py-1"
+                            onChange={handleUserInput}
+                            value={signupData.password}
+                        />
+                    </div>
+                    <button type="submit" className="bg-yellow-600 hover:bg-yellow-500 mt-2 py-2 rounded-sm font-semibold text-lg transition-all duration-300 cursor-pointer ease-in-out">
+                        Create Account
+                    </button>
+                    <p className="text-center">
+                        Already have an account ? <Link to="/login" className="text-accent cursor-pointer link">Login</Link>
+                    </p>
+
+                </form>
+            </div>
         </HomeLayout>
     )
 }

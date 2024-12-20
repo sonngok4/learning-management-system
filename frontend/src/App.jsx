@@ -8,6 +8,7 @@ import AboutUs from './Pages/AboutUs.jsx'
 import Contact from './Pages/Contact.jsx'
 import CourseDescripition from './Pages/Course/CourseDescription.jsx'
 import CourseList from './Pages/Course/CourseList.jsx'
+import MyCourses from './Pages/Course/MyCourses.jsx'
 import CreateCourse from './Pages/Course/CreateCourse.jsx'
 import EditCourse from './Pages/Course/EditCourse.jsx'
 import Denied from './Pages/Denied.jsx'
@@ -34,6 +35,7 @@ function App() {
         <Route path='/' element={<HomePage />}></Route>
         <Route path='/about' element={<AboutUs />}></Route>
         <Route path='/courses' element={<CourseList />}></Route>
+        <Route path='/courses/my-courses' element={<MyCourses />}></Route>
         <Route path='/contact' element={<Contact />}></Route>
         <Route path='/denied' element={<Denied />}></Route>
         <Route path='/course/description' element={<CourseDescripition />}></Route>
@@ -43,14 +45,16 @@ function App() {
         <Route path='/forget-password' element={<ForgetPassword />}></Route>
         <Route path="/reset-password/:resetToken" element={<ResetPassword />} />
 
-        <Route element={<RequireAuth allowedRoles={["ADMIN"]} />}>
+        <Route element={<RequireAuth allowedRoles={["admin"]} />}>
+          <Route path='/course/addlecture' element={<AddCourseLectures />}></Route>
+          <Route path='/admin/dashboard' element={<AdminDashboard />}></Route>
+        </Route>
+        <Route element={<RequireAuth allowedRoles={["admin", 'instructor']} />}>
           <Route path='/course/create' element={<CreateCourse />}></Route>
           <Route path='/course/edit' element={<EditCourse />}></Route>
-          <Route path='/course/addlecture' element={<AddCourseLectures />}></Route>
-          <Route path='/admin/deshboard' element={<AdminDashboard />}></Route>
         </Route>
 
-        <Route element={<RequireAuth allowedRoles={["ADMIN", 'USER']} />}>
+        <Route element={<RequireAuth allowedRoles={["admin", 'student', 'instructor']} />}>
           <Route path='/user/profile' element={<Profile />}></Route>
           <Route path='/user/editprofile' element={<EditProfile />}></Route>
           <Route path='/change-password' element={<ChangePassword />}></Route>

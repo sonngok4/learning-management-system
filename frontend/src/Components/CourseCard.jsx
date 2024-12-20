@@ -24,10 +24,10 @@ function CourseCard({ data }) {
                         <span className="font-bold text-yellow-500">Category: </span>
                         {data?.category}
                     </p>
-                    {/* <p className="font-semibold">
-                        <span className="font-bold text-yellow-500">Total lectures :</span>
-                        {data?.numberoflectures}
-                    </p> */}
+                    <p className="font-semibold">
+                        <span className="font-bold text-yellow-500">Total lectures:</span>{" "}
+                        {data?.lessons.length}
+                    </p>
                     <p className="font-semibold">
                         <span className="font-bold text-yellow-500">Instructor: </span>
                         {`${data?.instructor?.firstName} ${data?.instructor?.lastName}`}

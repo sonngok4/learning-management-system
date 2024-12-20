@@ -69,12 +69,12 @@ function HomeLayout({ children }) {
                             <Link to="/">Home</Link>
                         </li>
 
-                        {isLoggedIn && role == 'ADMIN' && (
+                        {isLoggedIn && role == 'admin' && (
                             <li>
-                                <Link to="/admin/deshboard">Admin Dashboard</Link>
+                                <Link to="/admin/dashboard">Admin Dashboard</Link>
                             </li>
                         )}
-                        {isLoggedIn && role === 'ADMIN' && (
+                        {isLoggedIn && (role === 'admin' || role === 'instructor') && (
                             <li>
                                 <Link to="/course/create"> Create new course</Link>
                             </li>
@@ -82,6 +82,11 @@ function HomeLayout({ children }) {
                         <li>
                             <Link to="/courses">All Courses</Link>
                         </li>
+                        {isLoggedIn && (role === 'student' || role === 'instructor') && (
+                            <li>
+                                <Link to="/courses/my-courses">My Courses</Link>
+                            </li>
+                        )}
 
                         <li>
                             <Link to="/contact">Contact Us</Link>

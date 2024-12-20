@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 const { ApiError } = require('../utils/api-error');
+const cloudinary = require('cloudinary').v2;
 
 dotenv.config();
 
@@ -10,6 +11,7 @@ class AuthController {
     static async register(req, res) {
         try {
             const { firstName, lastName, username, email, password } = req.body;
+
             console.log("Request body: ", firstName, lastName, username, email, password);
 
 
@@ -18,16 +20,53 @@ class AuthController {
                 throw new ApiError(400, 'User already exists');
             }
 
-            const user = await User.create({
+            // Convert buffer thành base64
+            const fileStr = req.file?.buffer.toString('base64');
+            const fileType = req.file?.mimetype;
+            const avatar = req.file;
+            let result = null;
+            if (avatar) {
+                try {
+                    result = await cloudinary.uploader.upload(`data:${fileType};base64,${fileStr}`, {
+                        folder: 'lms-assets/courses',  // Bạn có thể tùy chỉnh thư mục trong Cloudinary
+                        transformation: [{ width: 800, height: 600, crop: 'fill' }]  // Chỉnh sửa kích thước ảnh nếu cần
+                    });
+                } catch (error) {
+                    throw new ApiError(400, 'Avatar upload failed');
+                }
+            }
+
+            const userData = {
                 firstName,
                 lastName,
                 username,
                 email,
                 password
+            };
+
+            if (result) {
+                userData.avatar = result.secure_url;
+            }
+
+            const user = await User.create(userData);
+
+            const accessToken = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+            const refreshToken = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_REFRESH_SECRET, { expiresIn: '7d' });
+
+            res.cookie('accessToken', accessToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production', // Chỉ gửi qua HTTPS trong môi trường production
+                sameSite: 'Lax' // in development mode
+            });
+            res.cookie('refreshToken', refreshToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production', // Chỉ gửi qua HTTPS trong môi trường production
+                sameSite: 'Lax' // in development mode
             });
 
             res.status(201).json({
                 success: true,
+                message: 'User registered successfully',
                 user
             });
         } catch (error) {
@@ -74,7 +113,7 @@ class AuthController {
             });
 
             // Send response (optional: remove token from response if you rely entirely on cookies)
-            res.status(200).json({ success: true, user, accessToken, refreshToken });
+            res.status(200).json({ success: true, message: 'Login successful', user, accessToken, refreshToken });
         } catch (error) {
             throw new ApiError(400, error.message);
         }

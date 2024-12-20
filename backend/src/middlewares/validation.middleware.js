@@ -33,6 +33,7 @@ const schemas = {
             lastName: Joi.string().required(),
             username: Joi.string().required(),
             email: Joi.string().email().required(),
+            avatar: Joi.any(),
             password: Joi.string()
                 .min(8)
                 .pattern(new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d!@#$%^&*()_+={}|;:,.<>?`~\\-\\[\\]\\/]{8,}$'))
@@ -71,7 +72,7 @@ const schemas = {
             category: Joi.string().required(),
             level: Joi.string().valid('Beginner', 'Intermediate', 'Advanced').default('Beginner'),
             price: Joi.number().positive().required(),
-            coverImage: Joi.string().required() || Joi.any(),
+            coverImage: Joi.any(),
             tags: Joi.array().items(Joi.string()).required()
         }),
         update: Joi.object({

@@ -1,17 +1,17 @@
 import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux";
 
 import CourseCard from "../../Components/CourseCard";
 import HomeLayout from "../../Layouts/HomeLayout";
-import { getAllCourse } from "../../Redux/Slices/CourseSlice";
+import { getMyCourses } from "../../Redux/Slices/CourseSlice";
 
-function CourseList() {
+function MyCourses() {
 
     const dispatch = useDispatch()
     const { courseData } = useSelector((state) => state.course);
 
     async function loadCourses() {
-        await dispatch(getAllCourse());
+        await dispatch(getMyCourses());
     }
     useEffect(() => {
         loadCourses();
@@ -26,9 +26,13 @@ function CourseList() {
                     </span>
                 </h1>
                 <div className="gap-16 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 mx-auto mb-10 text-center">
-                    {courseData?.map((element) => {
-                        return <CourseCard key={element._id} data={element} />
-                    })}
+                    {courseData && courseData.length > 0 ? (
+                        courseData.map((element) => {
+                            return <CourseCard key={element._id} data={element} />;
+                        })
+                    ) : (
+                        <p>No courses available</p>
+                    )}
                 </div>
 
             </div>
@@ -36,4 +40,4 @@ function CourseList() {
         </HomeLayout>
     )
 }
-export default CourseList;
+export default MyCourses;

@@ -14,6 +14,7 @@ router.get('/:id', AuthMiddleware.authenticate, AuthMiddleware.authorize('admin'
 
 router.get('/role/:role', AuthMiddleware.authenticate, AuthMiddleware.authorize('admin'), UserController.getUserByRole);
 
+router.get('/by-user/me', AuthMiddleware.authenticate, UserController.getProfile);
 
 // Cập nhật thông tin người dùng (yêu cầu xác thực)
 router.put('/profile/:id',

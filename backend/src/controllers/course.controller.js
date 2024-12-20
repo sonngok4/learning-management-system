@@ -10,7 +10,12 @@ class CourseController {
         try {
             logger.info(`Course created for user: ${req.user._id}`);
             const courseData = req.body;
+            const coverImage = req.file ? req.file.path : null;
             console.log("courseData: ", courseData);
+
+            if (!req.file) {
+                throw new ApiError(400, 'Please upload a cover image.');
+            }
 
             // Nếu tags là chuỗi, tách nó thành mảng
             if (req.body.tags && typeof req.body.tags === 'string') {
@@ -18,10 +23,13 @@ class CourseController {
             }
 
             // Kiểm tra xem có file ảnh bìa gửi lên không
+            // Convert buffer thành base64
+            const fileStr = req.file?.buffer.toString('base64');
+            const fileType = req.file?.mimetype;
             let coverImageUrl = null;
             if (req.file) {
                 // Tải ảnh lên Cloudinary
-                const uploadResult = await cloudinary.uploader.upload(req.file.path, {
+                const uploadResult = await cloudinary.uploader.upload(`data:${fileType};base64,${fileStr}`, {
                     folder: 'lms-assets/courses',  // Bạn có thể tùy chỉnh thư mục trong Cloudinary
                     transformation: [{ width: 800, height: 600, crop: 'fill' }]  // Chỉnh sửa kích thước ảnh nếu cần
                 });
@@ -35,7 +43,11 @@ class CourseController {
                 instructor: req.user._id
             });
             await newCourse.save();
-            res.status(201).json(newCourse);
+            res.status(201).json({
+                success: true,
+                message: 'Course created successfully',
+                course: newCourse.populate('instructor', 'username email firstName lastName avatar')
+            });
         } catch (error) {
             throw new ApiError(400, error.message);
         }
@@ -211,10 +223,16 @@ class CourseController {
     }
 
 
-    static async getAllCourses(req, res) {
+    static async getMyCourses(req, res) {
         try {
             // Kiểm tra vai trò của người dùng
             const user = req.user;
+
+            if (!user) {
+                return res.status(401).json({ message: 'Chua dang nhap' });
+            }
+
+            console.log("User request: ", user);
 
             let courses;
             if (user.role === 'admin') {
@@ -236,6 +254,14 @@ class CourseController {
         }
     }
 
+    static async getAllCourses(req, res) {
+        try {
+            const courses = await Course.find().populate('instructor', 'username email firstName lastName avatar');
+            res.status(200).json(courses);
+        } catch (error) {
+            throw new ApiError(400, error.message);
+        }
+    }
 
     static async getCourseById(req, res) {
         try {

@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const AuthController = require('../controllers/auth.controller');
+const multer = require('multer');
+const upload = multer();
 const {
     validateSchema,
     schemas,
@@ -10,6 +12,7 @@ const AuthMiddleware = require('../middlewares/auth.middleware');
 
 // Đăng ký người dùng
 router.post('/register',
+    upload.single('avatar'),
     validateSchema(schemas.user.registration),
     AuthController.register
 );

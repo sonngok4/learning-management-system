@@ -34,7 +34,7 @@ function CourseDescripition() {
                                                 <span>
                                                     Total lectures :{" "}
                                                 </span>
-                                                {state?.numberOfLectures || "0"}
+                                        {state?.lessons.length}
                                         </p>
                                         <p className="font-semibold">
                                                 <span>
@@ -47,19 +47,34 @@ function CourseDescripition() {
                         </div>
 
                         <div className="space-y-3 text-xl">
-                                <p className="text-yellow-500"> Course description:   </p>
-                                <p className="lg:h-60">{state?.description}</p>
-                                {role==="ADMIN"||data?.subscription?.status=== "active"?(
-                                    <button onClick={()=>navigate("/course/displaylecture", {state:{...state}})} className="bg-yellow-600 hover:bg-yellow-500 px-5 py-3 rounded-md w-full font-bold text-xl transition-all duration-300 ease-in-out">
-                                        Watch lectures
-                                    </button>
-                                ):(
-                                    <button onClick={()=>navigate("/checkout")} className="bg-yellow-600 hover:bg-yellow-500 px-5 py-3 rounded-md w-full font-bold text-xl transition-all duration-300 ease-in-out">
-                                        Subscribe
-                                    </button>
-                                )
-                                }
+                            <p className="text-yellow-500">Course description:</p>
+                            <p className="lg:h-60">{state?.description}</p>
+
+                            {/* Kiểm tra điều kiện để hiển thị nút */}
+                            {role === "admin" || data?.subscription?.status === "active" ? (
+                                <button
+                                    onClick={() => navigate("/course/displaylecture", { state: { ...state } })}
+                                    className="bg-yellow-600 hover:bg-yellow-500 px-5 py-3 rounded-md w-full font-bold text-xl transition-all duration-300 ease-in-out"
+                                >
+                                    Watch lectures
+                                </button>
+                            ) : role === "instructor" ? (
+                                <button
+                                    onClick={() => navigate("/course/displaylecture", { state: { ...state } })}
+                                    className="bg-yellow-600 hover:bg-yellow-500 px-5 py-3 rounded-md w-full font-bold text-xl transition-all duration-300 ease-in-out"
+                                >
+                                    Watch lessons
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={() => navigate("/checkout")}
+                                    className="bg-yellow-600 hover:bg-yellow-500 px-5 py-3 rounded-md w-full font-bold text-xl transition-all duration-300 ease-in-out"
+                                >
+                                    Subscribe
+                                </button>
+                            )}
                         </div>
+
                         
                     </div>
                 </div>

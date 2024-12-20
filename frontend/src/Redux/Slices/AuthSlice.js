@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import toast from "react-hot-toast";
 
-import axiosInstance from "../../Helpers/axiosinstance"
+import axiosInstance from "../../Helpers/axiosinstance";
 
 const initialState = {
     isLoggedIn: localStorage.getItem('isLoggedIn') || false,
@@ -12,7 +12,11 @@ const initialState = {
 
 export const creatAccount = createAsyncThunk("/auth/singup", async (data) => {
     try {
-        const res = axiosInstance.post("auth/register", data);
+        const res = axiosInstance.post("auth/register", data, {
+            headers: {
+                "Content-Type": "multipart/form-data"
+            }
+        });
         toast.promise(res, {
             loading: "wait creating your account",
             success: (data) => {
@@ -63,7 +67,7 @@ export const logout = createAsyncThunk("/auth/logout", async () => {
 
 export const updateProfile = createAsyncThunk("/user/update/profile", async (data) => {
     try {
-        const res = axiosInstance.put(`user/update`, data);
+        const res = axiosInstance.put(`users/by-user/update`, data);
         toast.promise(res, {
             loading: "wait profile update in process..... ",
             success: (data) => {
@@ -78,12 +82,31 @@ export const updateProfile = createAsyncThunk("/user/update/profile", async (dat
     }
 })
 
-export const getuserData = createAsyncThunk("/user/details", async () => {
+export const getProfile = createAsyncThunk("/user/profile", async () => {
     try {
-        const res = axiosInstance.get("user/me");
+        const res = axiosInstance.get("/users/by-user/me", {
+            headers: {
+                includeToken: true,
+                credentials: "include"
+            }
+        });
         return (await res).data;
     } catch (error) {
-        toast.error(error?.message)
+        toast.error(error?.response?.data?.message)
+    }
+})
+
+export const getuserData = createAsyncThunk("/user/details", async () => {
+    try {
+        const res = axiosInstance.get("/users/by-user/me", {
+            headers: {
+                includeToken: true,
+                credentials: "include"
+            }
+        });
+        return (await res).data;
+    } catch (error) {
+        toast.error(error?.response?.data?.message)
     }
 })
 
